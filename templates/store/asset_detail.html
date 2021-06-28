@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container text-center col-md-6">
+<div class="card  text-white bg-dark card-product-grid m-4" style="width: 36rem;">
+    <img src="{{ single_asset.images.url }}" class="card-img-top" alt="{{ single_asset.description }}">
+    <div class="card-body">
+        <h5 class="card-title">{{ single_asset.asset_name }}</h5>
+        <p class="card-text">{{ single_asset.description }}</p>
+        <p class="card-text">∆ {% if single_asset.price > 0 %}{{ single_asset.price }}{% else %} {% endif %}</p>
+
+        {% if in_favorites %}
+        <h6 class="card-title">In Watchlist</h6>
+        {% else %}
+        <a href="{% url 'add_favorites' single_asset.id %}" class="btn btn-success">Add to Favorites</a>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<br>
+
+    <div class="comment-box-container">
+        <div class="comment-box bg-dark mb-5">
+            <div class="row">
+                <div class="col-md-9">
+    
+        
+                    <form action="{% url 'submit_comment' single_asset.id %}" method="POST">
+                    {% csrf_token %}
+                    <h5>Write Your Comment</h5>
+
+                    <div>
+                    <label>How do you rate this asset?</label>
+                    <br>
+                    <div class="rate">
+                        <input type="radio" name="rating" id="rating10" value="5" required><label for="rating10" title="5"></label>
+                        <input type="radio" name="rating" id="rating9" value="4.5" required><label for="rating9" title="4.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating8" value="4" required><label for="rating8" title="4"></label>
+                        <input type="radio" name="rating" id="rating7" value="3.5" required><label for="rating7" title="3.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating6" value="3" required><label for="rating6" title="3"></label>
+                        <input type="radio" name="rating" id="rating5" value="2.5" required><label for="rating5" title="2.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating4" value="2" required><label for="rating4" title="2"></label>
+                        <input type="radio" name="rating" id="rating3" value="1.5" required><label for="rating3" title="1.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating2" value="1" required><label for="rating2" title="1"></label>
+                        <input type="radio" name="rating" id="rating1" value="0.5" required><label for="rating1" title="0.5" class="half"></label>
+                    </div>
+                    <br>
+                    Comment:
+                    <textarea name="comment" rows="3" class="form-control"></textarea>
+                    <br>
+                    {% if user.is_authenticated %}
+                    <input type="submit" value="Submit Comment" class="btn btn-primary">
+                    {% else %}
+                    <p>You must be logged in to submit a comment. <span><a href="{% url 'login' %}">Login Now</a></span></p>
+                    {% endif %}
+                </div>
+
+            
+
+        </form>
+        
+    </div>
+    </div>
+        <br>
+        {% include 'includes/alerts.html' %}
+        <header class="section-heading">
+            <h3>Comments</h3>
+            <div class="comment-stars">
+                <span>
+                    <i class="fa fa-star{% if single_asset.average_rating < 0.5 %}-o{% elif single_asset.average_rating >= 0.5 and single_asset.average_rating < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_asset.average_rating < 1.5 %}-o{% elif single_asset.average_rating >= 1.5 and single_asset.average_rating < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_asset.average_rating < 2.5 %}-o{% elif single_asset.average_rating >= 2.5 and single_asset.average_rating < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_asset.average_rating < 3.5 %}-o{% elif single_asset.average_rating >= 3.5 and single_asset.average_rating < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_asset.average_rating < 4.5 %}-o{% elif single_asset.average_rating >= 4.5 and single_asset.average_rating < 5 %}-half-o {% endif %}" aria-hidden="true"></i> ({{single_asset.average_rating}})
+                </span>
+            </div>
+            <h6>{{ single_asset.count_comment}} comments</h6>
+            
+            
+        </header>
+
+        {% for comment in comments %}
+        <article class="box mb-3">
+            <div class="icontext w-100">
+                <div class="comment-pic-date">
+                    <img src="{{comment.user.profile_picture.url}}" alt="User Profile Picture" width="50" height="50" style="border-radius: 50%;">
+                <!-- <div class="text"> -->
+                    <div class="star-date-box">
+                        <p class="date text-muted">{{ comment.updated_at }}</p>
+                        <div class="comment-stars">
+                            <span>
+                                <i class="fa fa-star{% if comment.rating == 0.5 %}-half-o{% elif comment.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if comment.rating == 1.5 %}-half-o{% elif comment.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if comment.rating == 2.5 %}-half-o{% elif comment.rating < 3 %}-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if comment.rating == 3.5 %}-half-o{% elif comment.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if comment.rating == 4.5 %}-half-o{% elif comment.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text">
+                    <h6 class="mb-1">{{ comment.user.full_user_name }}</h6>
+                    <!-- <div class="comment-stars">
+                        <span>
+                            <i class="fa fa-star{% if comment.rating == 0.5 %}-half-o{% elif comment.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if comment.rating == 1.5 %}-half-o{% elif comment.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if comment.rating == 2.5 %}-half-o{% elif comment.rating < 3 %}-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if comment.rating == 3.5 %}-half-o{% elif comment.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if comment.rating == 4.5 %}-half-o{% elif comment.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
+                        </span>
+                    </div> -->
+                    
+                    
+                </div>
+            </div> <!-- icontext.// -->
+            <div class="mt-3">
+                <p>
+                    {{ comment.comment }}
+                </p>	
+            </div>
+        </article>
+        <hr>
+        {% endfor %}
+    
+        
+    
+        </div> <!-- col.// -->
+    </div> <!-- row.// -->
+
+{% endblock %}

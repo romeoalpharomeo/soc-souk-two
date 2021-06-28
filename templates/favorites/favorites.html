@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="home-banner">FAVORITES</h1>
+
+<div class="container text-center m-5">
+    <div class="row">
+<!-- You have to access the asset through the item by item.asset.asset_name, etc -->
+        {% if favorites_items%}
+        {% for item in favorites_items%}
+        <div class="col">
+            <div class="card  text-white bg-dark card-product-grid mb-2" style="width: 18rem;">
+                <img src="{{ item.asset.images.url }}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.asset.asset_name }}</h5>
+                    {% if item.asset.price > 0 %}
+                    <p>MINTED</p>
+                    <p class="card-text">∆ {{ item.asset.price }}</p>
+                    {% else %}
+                    <p>NOT MINTED YET</p>
+                    {% endif %}
+                    <a href="{{ item.asset.get_url }}" class="btn btn-primary">View</a>
+                    <a href="{% url 'remove_favorites' item.asset.id item.id%}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this item?')">Remove</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <h3 class="container text-center" style="color: white;">No items in watchlist, add some!</h3>
+        <a class="btn btn-info" href="{% url 'home' %}">Go to Gallery</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
